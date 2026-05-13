@@ -30,7 +30,7 @@ chrony.service   gpsd.service   ptp4l.service   phc2sys.service
 ### 1. Install dependencies
 
 ```bash
-cd /home/yahagi_day/ClockMonitor
+cd ~/ClockMonitor
 python3 -m venv --system-site-packages .venv
 source .venv/bin/activate
 pip install -r requirements.txt
@@ -56,7 +56,7 @@ sudo systemctl restart chrony
 Required for `serverstats` and `clients` commands, which need root access to the chrony command socket:
 
 ```bash
-echo "yahagi_day ALL=(root) NOPASSWD: /usr/bin/chronyc" | sudo tee /etc/sudoers.d/clockmonitor
+echo "$USER ALL=(root) NOPASSWD: /usr/bin/chronyc" | sudo tee /etc/sudoers.d/clockmonitor
 ```
 
 ### 4. Smoke test
@@ -66,7 +66,7 @@ source .venv/bin/activate
 uvicorn app.main:create_app --factory --host 0.0.0.0 --port 8080
 ```
 
-Open `http://192.168.1.229:8080/` and verify all sections populate within a few seconds.
+Open `http://<Pi-IP>:8080/` and verify all sections populate within a few seconds.
 
 ### 5. Install as systemd service
 
@@ -79,7 +79,7 @@ sudo systemctl enable --now clockmonitor
 ## Access
 
 ```
-http://192.168.1.229:8080/
+http://<Pi-IP>:8080/
 ```
 
 LAN-only. No authentication. Do not expose to the public internet.

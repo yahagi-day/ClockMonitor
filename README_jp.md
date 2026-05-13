@@ -28,7 +28,7 @@ chrony.service   gpsd.service   ptp4l.service   phc2sys.service
 ### 1. 依存パッケージのインストール
 
 ```bash
-cd /home/yahagi_day/ClockMonitor
+cd ~/ClockMonitor
 python3 -m venv --system-site-packages .venv
 source .venv/bin/activate
 pip install -r requirements.txt
@@ -54,7 +54,7 @@ sudo systemctl restart chrony
 `serverstats` / `clients` の取得に root 権限が必要なため:
 
 ```bash
-echo "yahagi_day ALL=(root) NOPASSWD: /usr/bin/chronyc" | sudo tee /etc/sudoers.d/clockmonitor
+echo "$USER ALL=(root) NOPASSWD: /usr/bin/chronyc" | sudo tee /etc/sudoers.d/clockmonitor
 ```
 
 ### 4. 動作確認
@@ -64,7 +64,7 @@ source .venv/bin/activate
 uvicorn app.main:create_app --factory --host 0.0.0.0 --port 8080
 ```
 
-`http://192.168.1.229:8080/` をブラウザで開き、全セクションが表示されることを確認します。
+`http://<Pi-IP>:8080/` をブラウザで開き、全セクションが表示されることを確認します。
 
 ### 5. systemd サービスとして登録
 
@@ -77,7 +77,7 @@ sudo systemctl enable --now clockmonitor
 ## アクセス
 
 ```
-http://192.168.1.229:8080/
+http://<Pi-IP>:8080/
 ```
 
 LAN 内専用です。認証はありません。インターネットに公開しないでください。
