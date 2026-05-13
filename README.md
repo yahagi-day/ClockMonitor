@@ -71,7 +71,7 @@ Open `http://<Pi-IP>:8080/` and verify all sections populate within a few second
 ### 5. Install as systemd service
 
 ```bash
-sudo cp clockmonitor.service /etc/systemd/system/
+sed "s/YOUR_USER/$USER/g" clockmonitor.service | sudo tee /etc/systemd/system/clockmonitor.service
 sudo systemctl daemon-reload
 sudo systemctl enable --now clockmonitor
 ```

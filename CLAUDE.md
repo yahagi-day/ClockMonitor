@@ -11,7 +11,7 @@ ClockMonitor is a read-only FastAPI web dashboard (port 8080) for a Raspberry Pi
 ## Running the app
 
 ```bash
-# Development (from /home/yahagi_day/ClockMonitor)
+# Development (from ~/ClockMonitor)
 source .venv/bin/activate
 uvicorn app.main:create_app --factory --host 0.0.0.0 --port 8080 --reload
 
@@ -67,7 +67,7 @@ Collectors (background tasks)       Storage            API
 ## System context
 
 - `/etc/chrony/chrony.conf` — `cmdallow 127.0.0.1` + `bindcmdaddress 127.0.0.1` added for serverstats access
-- `/etc/sudoers.d/clockmonitor` — `yahagi_day ALL=(root) NOPASSWD: /usr/bin/chronyc`
+- `/etc/sudoers.d/clockmonitor` — `<user> ALL=(root) NOPASSWD: /usr/bin/chronyc`
 - `/var/run/ptp4lro` — ptp4l read-only UDS socket (world-writable, exists by default)
 - `/sys/class/pps/pps0/assert` — world-readable PPS assert timestamp
 - The systemd service drops `NoNewPrivileges` to allow sudo for chronyc

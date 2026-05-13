@@ -69,7 +69,7 @@ uvicorn app.main:create_app --factory --host 0.0.0.0 --port 8080
 ### 5. systemd サービスとして登録
 
 ```bash
-sudo cp clockmonitor.service /etc/systemd/system/
+sed "s/YOUR_USER/$USER/g" clockmonitor.service | sudo tee /etc/systemd/system/clockmonitor.service
 sudo systemctl daemon-reload
 sudo systemctl enable --now clockmonitor
 ```
