@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ClockMonitor — {{ hostname }}</title>
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+<div id="disconnected-banner">⚠ SSE stream disconnected — reconnecting…</div>
+
+<div id="header">
+  <h1>ClockMonitor</h1>
+  <span class="hostname">{{ hostname }}</span>
+  <span class="spacer"></span>
+  <span id="utc-clock">--:--:-- UTC</span>
+  <span id="overall-pill" class="pill pill-unknown">–</span>
+</div>
+
+<div class="grid">
+
+  <!-- ── System Clock (chrony) ─────────────────── -->
+  <div class="card" id="card-chrony">
+    <div class="card-header">
+      <h2>System Clock</h2>
+      <span id="chrony-pill" class="pill pill-unknown">–</span>
+      <span style="margin-left:auto;font-size:11px;color:var(--muted)">chrony 4.6</span>
+    </div>
+
+    <div class="big-val" id="chrony-offset-big">– ns</div>
+    <div style="color:var(--muted);font-size:11px;margin-bottom:10px">system time offset</div>
+
+    <div class="kv-grid">
+      <span class="kv-label">Stratum</span>
+      <span class="kv-val" data-field="chrony.stratum">–</span>
+
+      <span class="kv-label">Ref ID</span>
+      <span class="kv-val" data-field="chrony.ref_id">–</span>
+
+      <span class="kv-label">RMS offset</span>
+      <span class="kv-val" data-field="chrony.rms_offset_s">–</span>
+
+      <span class="kv-label">Freq error</span>
+      <span class="kv-val" data-field="chrony.frequency_ppm">–</span>
+
+      <span class="kv-label">Skew</span>
+      <span class="kv-val" data-field="chrony.skew_ppm">–</span>
+
+      <span class="kv-label">Root delay</span>
+      <span class="kv-val" data-field="chrony.root_delay_s">–</span>
+
+      <span class="kv-label">Root disp.</span>
+      <span class="kv-val" data-field="chrony.root_dispersion_s">–</span>
+
+      <span class="kv-label">Leap status</span>
+      <span class="kv-val" data-field="chrony.leap_status">–</span>
+    </div>
+
+    <table class="source-table" id="chrony-sources-table">
+      <thead><tr><th>M</th><th>S</th><th>Name</th><th>Stratum</th><th>Offset</th></tr></thead>
+      <tbody id="chrony-sources-body"></tbody>
+    </table>
+  </div>
+
+  <!-- ── GPS (gpsd) ────────────────────────────── -->
+  <div class="card" id="card-gps">
+    <div class="card-header">
+      <h2>GPS</h2>
+      <span id="gps-pill" class="pill pill-unknown">–</span>
+      <span style="margin-left:auto;font-size:11px;color:var(--muted)">gpsd 3.25</span>
+    </div>
+
+    <div style="display:flex;gap:16px;margin-bottom:10px;align-items:flex-end">
+      <div>
+        <div style="color:var(--muted);font-size:11px">Fix Mode</div>
+        <div class="big-val" id="gps-mode-big" style="font-size:22px">–</div>
+      </div>
+      <div>
+        <div style="color:var(--muted);font-size:11px">Sats used / visible</div>
+        <div class="big-val" style="font-size:22px">
+          <span id="gps-sats-used">–</span>
+          <span style="color:var(--muted);font-size:14px"> / </span>
+          <span id="gps-sats-visible">–</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="kv-grid">
+      <span class="kv-label">Latitude</span>
+      <span class="kv-val" id="gps-lat">–</span>
+
+      <span class="kv-label">Longitude</span>
+      <span class="kv-val" id="gps-lon">–</span>
+
+      <span class="kv-label">Altitude</span>
+      <span class="kv-val" id="gps-alt">–</span>
+
+      <span class="kv-label">Time (GPS)</span>
+      <span class="kv-val" id="gps-time" style="font-size:11px">–</span>
+
+      <span class="kv-label">Horiz. err (epx/y)</span>
+      <span class="kv-val" id="gps-ep">–</span>
+    </div>
+  </div>
+
+  <!-- ── NTP Server ───────────────────────────── -->
+  <div class="card" id="card-ntp">
+    <div class="card-header">
+      <h2>NTP Server</h2>
+      <span style="margin-left:auto;font-size:11px;color:var(--muted)">Stratum 1 · UDP/123</span>
+    </div>
+
+    <div class="kv-grid">
+      <span class="kv-label">Packets received</span>
+      <span class="kv-val" id="ntp-rx">–</span>
+
+      <span class="kv-label">Packets dropped</span>
+      <span class="kv-val" id="ntp-drop">–</span>
+
+      <span class="kv-label">Cmd packets rx</span>
+      <span class="kv-val" id="ntp-cmd-rx">–</span>
+
+      <span class="kv-label">Interleaved</span>
+      <span class="kv-val" id="ntp-interleaved">–</span>
+
+      <span class="kv-label">HW TX timestamps</span>
+      <span class="kv-val" id="ntp-hw-tx">–</span>
+    </div>
+
+    <div style="margin-top:10px">
+      <div style="color:var(--muted);font-size:11px;margin-bottom:4px">Active clients (last 30s refresh)</div>
+      <table class="source-table" id="ntp-clients-table">
+        <thead><tr><th>Hostname</th><th>NTP rx</th><th>Drop</th><th>Last</th></tr></thead>
+        <tbody id="ntp-clients-body"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ── PTP ───────────────────────────────────── -->
+  <div class="card" id="card-ptp">
+    <div class="card-header">
+      <h2>PTP</h2>
+      <span id="ptp-pill" class="pill pill-unknown">–</span>
+      <span id="ptp-source-badge" style="display:none;margin-left:4px;font-size:10px;color:var(--amber)">journal</span>
+      <span style="margin-left:auto;font-size:11px;color:var(--muted)">ptp4l</span>
+    </div>
+
+    <div class="big-val" id="ptp-offset-big">– ns</div>
+    <div style="color:var(--muted);font-size:11px;margin-bottom:10px">offset from master</div>
+
+    <div class="kv-grid">
+      <span class="kv-label">Port state</span>
+      <span class="kv-val" id="ptp-port-state">–</span>
+
+      <span class="kv-label">Path delay</span>
+      <span class="kv-val" id="ptp-delay">–</span>
+
+      <span class="kv-label">Steps removed</span>
+      <span class="kv-val" data-field="ptp4l.steps_removed">–</span>
+
+      <span class="kv-label">Port identity</span>
+      <span class="kv-val" data-field="ptp4l.port_identity" style="font-size:11px">–</span>
+    </div>
+  </div>
+
+  <!-- ── PPS ───────────────────────────────────── -->
+  <div class="card" id="card-pps">
+    <div class="card-header">
+      <h2>PPS Heartbeat</h2>
+      <span id="pps-pill" class="pill pill-unknown">–</span>
+    </div>
+    <div class="pps-devices" id="pps-devices"></div>
+  </div>
+
+  <!-- ── Services ──────────────────────────────── -->
+  <div class="card" id="card-services">
+    <div class="card-header">
+      <h2>Services</h2>
+      <span id="svc-pill" class="pill pill-unknown">–</span>
+    </div>
+    <div class="services-row" id="services-row"></div>
+  </div>
+
+  <!-- ── Charts ────────────────────────────────── -->
+  <div class="card card-wide">
+    <div class="card-header"><h2>Chrony — System Offset (last 10 min)</h2></div>
+    <div class="chart-wrap"><canvas id="chart-chrony"></canvas></div>
+  </div>
+
+  <div class="card card-wide">
+    <div class="card-header"><h2>PTP — Master Offset (last 10 min)</h2></div>
+    <div class="chart-wrap"><canvas id="chart-ptp"></canvas></div>
+  </div>
+
+  <div class="card card-wide">
+    <div class="card-header"><h2>GPS — Satellites (last 10 min)</h2></div>
+    <div class="chart-wrap"><canvas id="chart-gps"></canvas></div>
+  </div>
+
+</div><!-- .grid -->
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.6/dist/chart.umd.min.js"></script>
+<script type="module" src="/static/app.js"></script>
+</body>
+</html>
